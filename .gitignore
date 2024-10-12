@@ -4,6 +4,7 @@
 # XMake
 /.xmake/
 /build/
+/bin/
 
 # Compile Commands
 /.cache/

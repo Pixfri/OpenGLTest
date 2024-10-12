@@ -3,6 +3,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+void ProcessInput(GLFWwindow* window);
+
 int main() {
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW." << std::endl;
@@ -24,9 +26,19 @@ int main() {
         std::cerr << "Failed to load OpenGL loader." << std::endl;
         return -3;
     }
+    
+    glfwSetWindowSizeCallback(window, [](GLFWwindow* win, int width, int height) {
+        OGLTEST_UNUSED(win);
+        glViewport(0, 0, width, height);
+    });
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
+        ProcessInput(window);
+
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
         glfwSwapBuffers(window);
     }
 
@@ -35,4 +47,10 @@ int main() {
     glfwTerminate();
 
     return 0;
+}
+
+void ProcessInput(GLFWwindow* window) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, true);
+    }
 }
