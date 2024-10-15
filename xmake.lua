@@ -21,8 +21,15 @@ set_warnings("allextra")
 
 option("use_pch", {description = "Use the precompiled header to speed up compilation speeds.", default = true})
 
+rule("cp-resources")
+  after_build(function (target)
+    os.cp("Resources", "bin/$(plat)_$(arch)_$(mode)")
+  end)
+
 target("OpenGLTest")
     set_kind("binary")
+
+    add_rules("cp-resources")
 
     add_files("Source/OpenGLTest/**.cpp")
     add_headerfiles("Include/**.hpp", "Include/OpenGLTest/**.h")
@@ -33,3 +40,5 @@ target("OpenGLTest")
     end
       
     add_packages("glad", "glfw")
+
+includes("xmake/**.lua")
