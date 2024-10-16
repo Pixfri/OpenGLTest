@@ -26,6 +26,8 @@ rule("cp-resources")
     os.cp("Resources", "bin/$(plat)_$(arch)_$(mode)")
   end)
 
+includes("xmake/**.lua")
+
 target("OpenGLTest")
     set_kind("binary")
 
@@ -40,5 +42,3 @@ target("OpenGLTest")
     end
       
     add_packages("glad", "glfw")
-
-includes("xmake/**.lua")
