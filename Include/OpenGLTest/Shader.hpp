@@ -6,8 +6,6 @@
 
 #include <OpenGLTest/pch.hpp>
 
-#include <glad/glad.h>
-
 #include <filesystem>
 #include <string>
 
@@ -25,10 +23,11 @@ namespace OGLTest {
         Shader& operator=(const Shader&) = delete;
         Shader& operator=(Shader&&) = delete;
 
-        void Use();
+        void Use() const;
 
-        template <typename T>
-        void Set(const std::string& name, T& value) const;
+        void Set(const std::string& name, const bool& value) const;
+        void Set(const std::string& name, const Int32& value) const;
+        void Set(const std::string& name, const Float32& value) const;
         
     private:
     };
