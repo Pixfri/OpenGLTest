@@ -10,7 +10,7 @@ else
   add_defines("OGLTEST_DEBUG")
 end
 
-add_requires("glad", "glfw")
+add_requires("glad", "glfw", "stb")
 
 set_encodings("utf-8")
 set_exceptions("cxx")
@@ -41,4 +41,4 @@ target("OpenGLTest")
       set_pcxxheader("Include/OpenGLTest/pch.hpp")
     end
       
-    add_packages("glad", "glfw")
+    add_packages("glad", "glfw", "stb")
