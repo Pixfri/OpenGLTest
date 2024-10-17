@@ -9,6 +9,8 @@
 #include <filesystem>
 #include <string>
 
+#include <glm/glm.hpp>
+
 namespace OGLTest {
     class Shader {
     public:
@@ -28,6 +30,12 @@ namespace OGLTest {
         void Set(const std::string& name, const bool& value) const;
         void Set(const std::string& name, const Int32& value) const;
         void Set(const std::string& name, const Float32& value) const;
+        void Set(const std::string& name, const glm::mat2& value) const;
+        void Set(const std::string& name, const glm::mat3& value) const;
+        void Set(const std::string& name, const glm::mat4& value) const;
+        void Set(const std::string& name, const glm::vec2& value) const;
+        void Set(const std::string& name, const glm::vec3& value) const;
+        void Set(const std::string& name, const glm::vec4& value) const;
         
     private:
     };

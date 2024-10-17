@@ -6,6 +6,10 @@
 
 #include <glad/glad.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <fstream>
 #include <sstream>
 
@@ -104,4 +108,29 @@ namespace OGLTest {
     void Shader::Set(const std::string& name, const Float32& value) const {
         glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
     }
+
+    void Shader::Set(const std::string& name, const glm::mat2& value) const {
+        glUniformMatrix2fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
+    }
+
+    void Shader::Set(const std::string& name, const glm::mat3& value) const {
+        glUniformMatrix3fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
+    } 
+
+    void Shader::Set(const std::string& name, const glm::mat4& value) const {
+        glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
+    } 
+
+    void Shader::Set(const std::string& name, const glm::vec2& value) const {
+        glUniform2fv(glGetUniformLocation(ID, name.c_str()), 1, glm::value_ptr(value));
+    } 
+
+    void Shader::Set(const std::string& name, const glm::vec3& value) const {
+        glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, glm::value_ptr(value));
+    } 
+
+    void Shader::Set(const std::string& name, const glm::vec4& value) const {
+        glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, glm::value_ptr(value));
+    } 
+
 }
