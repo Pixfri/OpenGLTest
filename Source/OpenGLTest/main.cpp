@@ -16,6 +16,7 @@
 #include <stb/stb_image.h>
 
 #include <cmath>
+#include <chrono>
 
 void ProcessInput(GLFWwindow* window);
 
@@ -49,6 +50,8 @@ int main() {
         OGLTEST_UNUSED(win);
         glViewport(0, 0, width, height);
     });
+
+    glEnable(GL_DEPTH_TEST);
     
     float vertices[] = {
         // Positions          // UVs
@@ -162,12 +165,21 @@ int main() {
     shader.Set("view", view);
     shader.Set("proj", projection);
 
+    OGLTest::Float64 currentTime = glfwGetTime();
+    OGLTest::Float32 deltaTime = 0.016f;
+
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         ProcessInput(window);
 
+        OGLTest::Float64 lastTime = currentTime;
+        currentTime = glfwGetTime();
+        
+        deltaTime = static_cast<OGLTest::Float32>(currentTime - lastTime);
+        std::cout << deltaTime << std::endl;
+
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shader.Use();
         glActiveTexture(GL_TEXTURE0);
@@ -175,7 +187,7 @@ int main() {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture1);
 
-        model = glm::rotate(model, static_cast<OGLTest::Float32>(glfwGetTime()) * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(50.0f) * deltaTime, glm::vec3(0.5f, 1.0f, 0.0f));
         shader.Set("model", model);
         
         glBindVertexArray(VAO);
