@@ -194,9 +194,17 @@ int main() {
         lightingShader.Set("material.specular", 0.5f, 0.5f, 0.5f);
         lightingShader.Set("material.shininess", 32.f);
 
+        glm::vec3 lightColor;
+        lightColor.x = static_cast<float>(sin(glfwGetTime() * 2.0f));
+        lightColor.y = static_cast<float>(sin(glfwGetTime() * 0.7f));
+        lightColor.z = static_cast<float>(sin(glfwGetTime() * 1.3f));
+
+        glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+
         lightingShader.Set("light.position", g_LightPos);
-        lightingShader.Set("light.ambient", 0.2f, 0.2f, 0.2f);
-        lightingShader.Set("light.diffuse", 0.5f, 0.5f, 0.5f);
+        lightingShader.Set("light.ambient", ambientColor);
+        lightingShader.Set("light.diffuse", diffuseColor);
         lightingShader.Set("light.specular", 1.0f, 1.0f, 1.0f);
 
         glm::mat4 projection = glm::perspective(glm::radians(g_Camera.Fov), static_cast<float>(WINDOW_WIDTH) / static_cast<float>(WINDOW_HEIGHT), 0.1f, 100.0f);
