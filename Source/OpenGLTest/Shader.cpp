@@ -41,7 +41,7 @@ namespace OGLTest {
             vertexCode = vShaderStream.str();
             fragmentCode = fShaderStream.str();
         } catch (const std::ifstream::failure& e) {
-            std::cerr << "Couldn't read shader file" << std::endl;
+            std::cerr << "Couldn't read shader file.\nError: " << e.what() << '\n';
         }
         const char* vShaderCode = vertexCode.c_str();
         const char* fShaderCode = fragmentCode.c_str();
@@ -60,7 +60,7 @@ namespace OGLTest {
 
         if (!success) {
             glGetShaderInfoLog(vertex, 512, nullptr, infoLog);
-            std::cerr << "Failed to compile vertex shader.\nReason:" << infoLog << std::endl;
+            std::cerr << "Failed to compile vertex shader.\nReason:" << infoLog << '\n';
         }
 
         // Fragment shader
@@ -72,7 +72,7 @@ namespace OGLTest {
 
         if (!success) {
             glGetShaderInfoLog(fragment, 512, nullptr, infoLog);
-            std::cerr << "Failed to compile fragment shader.\nReason:" << infoLog << std::endl;
+            std::cerr << "Failed to compile fragment shader.\nReason:" << infoLog << '\n';
         }
 
         // Shader program.
@@ -85,7 +85,7 @@ namespace OGLTest {
 
         if (!success) {
             glGetProgramInfoLog(ID, 512, nullptr, infoLog);
-            std::cerr << "Failed to link shader program.\nReason:" << infoLog << std::endl;
+            std::cerr << "Failed to link shader program.\nReason:" << infoLog << '\n';
         }
 
         // Delete the shaders as they're linked and no longer necessary.
