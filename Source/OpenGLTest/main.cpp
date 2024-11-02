@@ -183,13 +183,14 @@ int main() {
         
         ProcessInput(window, g_DeltaTime);
         
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         lightingShader.Use();
         lightingShader.Set("objectColor", 1.0, 0.5f, 0.31f);
         lightingShader.Set("lightColor", 1.0f, 1.0f, 1.0f);
         lightingShader.Set("lightPos", g_LightPos);
+        lightingShader.Set("viewPos", g_Camera.Position);
 
         glm::mat4 projection = glm::perspective(glm::radians(g_Camera.Fov), static_cast<float>(WINDOW_WIDTH) / static_cast<float>(WINDOW_HEIGHT), 0.1f, 100.0f);
         glm::mat4 view = g_Camera.GetViewMatrix();
