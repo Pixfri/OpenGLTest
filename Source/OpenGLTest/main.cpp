@@ -30,6 +30,8 @@ bool g_FirstMouse = true;
 std::chrono::high_resolution_clock::time_point g_CurrentTime;
 OGLTest::Float32 g_DeltaTime = 0.016f;
 
+glm::vec3 g_LightPos(1.2f, 1.0f, 2.0f);
+
 void ProcessInput(GLFWwindow* window, OGLTest::Float32 deltaTime);
 OGLTest::UInt32 LoadTexture(const std::string& path);
 
@@ -93,7 +95,7 @@ int main() {
     
     glEnable(GL_DEPTH_TEST);
     
-    OGLTest::Shader lightingShader{"Resources/Shaders/common.vert", "Resources/Shaders/color.frag"};
+    OGLTest::Shader lightingShader{"Resources/Shaders/common.vert", "Resources/Shaders/point_light.frag"};
     OGLTest::Shader lightCubeShader{"Resources/Shaders/common.vert", "Resources/Shaders/light.frag"};
     
     float vertices[] = {
@@ -211,12 +213,15 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         lightingShader.Use();
-        lightingShader.Set("light.direction", -0.2f, -1.0f, -0.3f);
+        lightingShader.Set("light.position", g_LightPos);
         lightingShader.Set("viewPos", g_Camera.Position);
         
         lightingShader.Set("light.ambient", 0.2f, 0.2f, 0.2f);
         lightingShader.Set("light.diffuse", 0.5f, 0.5f, 0.5f);
         lightingShader.Set("light.specular", 1.0f, 1.0f, 1.0f);
+        lightingShader.Set("light.constant", 1.0f);
+        lightingShader.Set("light.linear", 0.09f);
+        lightingShader.Set("light.quadratic", 0.032f);
 
         lightingShader.Set("material.shininess", 32.0f);
 
@@ -244,6 +249,17 @@ int main() {
             
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
+
+        lightCubeShader.Use();
+        lightCubeShader.Set("proj", projection);
+        lightCubeShader.Set("view", view);
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, g_LightPos);
+        model = glm::scale(model, glm::vec3(0.2f));
+        lightCubeShader.Set("model", model);
+
+        glBindVertexArray(lightCubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glBindVertexArray(0);
 
