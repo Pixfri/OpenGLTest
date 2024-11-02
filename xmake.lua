@@ -34,10 +34,15 @@ target("OpenGLTest")
     add_rules("cp-resources")
 
     add_files("Source/OpenGLTest/**.cpp")
-    add_headerfiles("Include/**.hpp", "Include/OpenGLTest/**.inl")
+    for _, ext in ipairs({".hpp", ".inl"}) do
+      add_headerfiles("Include/**" .. ext)
+    end
+    
     add_includedirs("Include/", {public = true})
     
-    add_extrafiles("Resources/**.vert", "Resources/**.frag")
+    for _, ext in ipairs({".vert", ".frag", ".png"}) do
+      add_extrafiles("Resources/**" .. ext)
+    end
 
     if has_config("use_pch") then
       set_pcxxheader("Include/OpenGLTest/pch.hpp")
