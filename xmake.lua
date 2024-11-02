@@ -36,6 +36,8 @@ target("OpenGLTest")
     add_files("Source/OpenGLTest/**.cpp")
     add_headerfiles("Include/**.hpp", "Include/OpenGLTest/**.inl")
     add_includedirs("Include/", {public = true})
+    
+    add_extrafiles("Resources/**.vert", "Resources/**.frag")
 
     if has_config("use_pch") then
       set_pcxxheader("Include/OpenGLTest/pch.hpp")

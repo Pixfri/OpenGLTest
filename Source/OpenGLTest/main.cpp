@@ -5,6 +5,7 @@
 #include "OpenGLTest/pch.hpp"
 
 #include <OpenGLTest/Shader.hpp>
+#include <OpenGLTest/Camera.hpp>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -18,18 +19,16 @@
 #include <cmath>
 #include <chrono>
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH 1920
+#define WINDOW_HEIGHT 1080
 
-glm::vec3 g_CameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 g_CameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 g_CameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
+OGLTest::Camera g_Camera(glm::vec3(0.0f, 0.0f, 3.0f));
 OGLTest::Float32 g_LastX = WINDOW_WIDTH / 2.0f;
 OGLTest::Float32 g_LastY = WINDOW_HEIGHT / 2.0f;
-OGLTest::Float32 g_Yaw = -90.0f; // yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
-OGLTest::Float32 g_Pitch = 0.0f;
 bool g_FirstMouse = true;
+
+std::chrono::high_resolution_clock::time_point g_CurrentTime;
+OGLTest::Float32 g_DeltaTime = 0.016f;
 
 void ProcessInput(GLFWwindow* window, OGLTest::Float32 deltaTime);
 
@@ -77,30 +76,20 @@ int main() {
         
         OGLTest::Float32 xOffset = static_cast<OGLTest::Float32>(xPos) - g_LastX;
         OGLTest::Float32 yOffset = g_LastY - static_cast<OGLTest::Float32>(yPos);
+
         g_LastX = static_cast<OGLTest::Float32>(xPos);
         g_LastY = static_cast<OGLTest::Float32>(yPos);
 
-        constexpr float sensitivity = 0.1f;
-        xOffset *= sensitivity;
-        yOffset *= sensitivity;
-
-        g_Yaw += xOffset;
-        g_Pitch += yOffset;
-
-        if (g_Pitch > 89.0f) {
-            g_Pitch = 89.0f;
-        }
-        if (g_Pitch < -89.0f) {
-            g_Pitch = -89.0f;
-        }
-
-        glm::vec3 direction;
-        direction.x = std::cos(glm::radians(g_Yaw)) * std::cos(glm::radians(g_Pitch));
-        direction.y = std::sin(glm::radians(g_Pitch));
-        direction.z = std::sin(glm::radians(g_Yaw)) * std::cos(glm::radians(g_Pitch));
-        g_CameraFront = glm::normalize(direction);
+        g_Camera.ProcessMouseMovement(xOffset, yOffset);
     });
 
+    glfwSetScrollCallback(window, [](GLFWwindow* win, OGLTest::Float64 xOffset, OGLTest::Float64 yOffset) -> void {
+        OGLTEST_UNUSED(win);
+        OGLTEST_UNUSED(xOffset);
+
+        g_Camera.ProcessMouseScroll(static_cast<OGLTest::Float32>(yOffset));
+    });
+    
     glEnable(GL_DEPTH_TEST);
     
     float vertices[] = {
@@ -205,10 +194,6 @@ int main() {
     shader.Set("texture0", 0);
     shader.Set("texture1", 1);
     
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-
-    shader.Set("proj", projection);
-
     glm::vec3 cubePositions[] = {
         glm::vec3( 0.0f,  0.0f,  0.0f), 
         glm::vec3( 2.0f,  5.0f, -15.0f), 
@@ -222,33 +207,32 @@ int main() {
         glm::vec3(-1.3f,  1.0f, -1.5f)  
     };
 
-    std::chrono::high_resolution_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
-    OGLTest::Float32 deltaTime = 0.016f;
+    g_CurrentTime = std::chrono::high_resolution_clock::now();
     
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
-        auto oldTime = currentTime;
-        currentTime = std::chrono::high_resolution_clock::now();
+        auto oldTime = g_CurrentTime;
+        g_CurrentTime = std::chrono::high_resolution_clock::now();
 
-        std::chrono::duration<double, std::milli> timeSpan = (currentTime - oldTime);
-        deltaTime = static_cast<OGLTest::Float32>(timeSpan.count() / 1000.0);
+        std::chrono::duration<double, std::milli> timeSpan = (g_CurrentTime - oldTime);
+        g_DeltaTime = static_cast<OGLTest::Float32>(timeSpan.count() / 1000.0);
         
-        ProcessInput(window, deltaTime);
+        ProcessInput(window, g_DeltaTime);
         
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glm::mat4 view;
-        view = glm::lookAt(g_CameraPos, g_CameraPos + g_CameraFront, g_CameraUp);
-
+        
         shader.Use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture0);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture1);
 
-        shader.Set("view", view);
+        glm::mat4 projection = glm::perspective(glm::radians(g_Camera.Fov), static_cast<float>(WINDOW_WIDTH) / static_cast<float>(WINDOW_HEIGHT), 0.1f, 100.0f);
+        shader.Set("proj", projection);
+
+        shader.Set("view", g_Camera.GetViewMatrix());
         
         glBindVertexArray(VAO);
         for (OGLTest::UInt32 i = 0; i < 10; i++) {
@@ -280,18 +264,17 @@ void ProcessInput(GLFWwindow* window, const OGLTest::Float32 deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
     }
-
-    constexpr OGLTest::Float32 cameraSpeed = 2.5f;
+    
     if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) {
-        g_CameraPos += (cameraSpeed * deltaTime) * g_CameraFront;
+        g_Camera.ProcessKeyboard(OGLTest::CameraMovement::Forward, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
-        g_CameraPos -= (cameraSpeed * deltaTime) * g_CameraFront;
+        g_Camera.ProcessKeyboard(OGLTest::CameraMovement::Backward, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS) {
-        g_CameraPos -= glm::normalize(glm::cross(g_CameraFront, g_CameraUp)) * (cameraSpeed * deltaTime);
+        g_Camera.ProcessKeyboard(OGLTest::CameraMovement::Left, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_SEMICOLON) == GLFW_PRESS) {
-        g_CameraPos += glm::normalize(glm::cross(g_CameraFront, g_CameraUp)) * (cameraSpeed * deltaTime);
+        g_Camera.ProcessKeyboard(OGLTest::CameraMovement::Right, deltaTime);
     }
 }
