@@ -30,8 +30,6 @@ bool g_FirstMouse = true;
 std::chrono::high_resolution_clock::time_point g_CurrentTime;
 OGLTest::Float32 g_DeltaTime = 0.016f;
 
-glm::vec3 g_LightPos(1.2f, 1.0f, 2.0f);
-
 void ProcessInput(GLFWwindow* window, OGLTest::Float32 deltaTime);
 OGLTest::UInt32 LoadTexture(const std::string& path);
 
@@ -143,6 +141,19 @@ int main() {
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
     };
 
+    glm::vec3 cubePositions[] = {
+        glm::vec3( 0.0f,  0.0f,  0.0f),
+        glm::vec3( 2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3( 2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3( 1.3f, -2.0f, -2.5f),
+        glm::vec3( 1.5f,  2.0f, -2.5f),
+        glm::vec3( 1.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
+
     // Configure the cube's VAO and VBO
     GLuint VBO, cubeVAO;
     glGenVertexArrays(1, &cubeVAO);
@@ -182,7 +193,6 @@ int main() {
     lightingShader.Use();
     lightingShader.Set("material.diffuse", 0);
     lightingShader.Set("material.specular", 1);
-    lightingShader.Set("material.shininess", 64.f);
 
     g_CurrentTime = std::chrono::high_resolution_clock::now();
     
@@ -201,21 +211,19 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         lightingShader.Use();
+        lightingShader.Set("light.direction", -0.2f, -1.0f, -0.3f);
         lightingShader.Set("viewPos", g_Camera.Position);
         
-        lightingShader.Set("light.position", g_LightPos);
         lightingShader.Set("light.ambient", 0.2f, 0.2f, 0.2f);
         lightingShader.Set("light.diffuse", 0.5f, 0.5f, 0.5f);
         lightingShader.Set("light.specular", 1.0f, 1.0f, 1.0f);
+
+        lightingShader.Set("material.shininess", 32.0f);
 
         glm::mat4 projection = glm::perspective(glm::radians(g_Camera.Fov), static_cast<float>(WINDOW_WIDTH) / static_cast<float>(WINDOW_HEIGHT), 0.1f, 100.0f);
         glm::mat4 view = g_Camera.GetViewMatrix();
         lightingShader.Set("proj", projection);
         lightingShader.Set("view", view);
-
-        // Cube world transform
-        glm::mat4 model = glm::mat4(1.0f);
-        lightingShader.Set("model", model);
 
         // Bind diffuse map
         glActiveTexture(GL_TEXTURE0);
@@ -224,22 +232,18 @@ int main() {
         // Bind specular map
         glActiveTexture(GL_TEXTURE1),
         glBindTexture(GL_TEXTURE_2D, specularMap);
-
-        // Render the cube
+        
+        // Render the cubes
         glBindVertexArray(cubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-
-        // Also draw the light cube
-        lightCubeShader.Use();
-        lightCubeShader.Set("proj", projection);
-        lightCubeShader.Set("view", view);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, g_LightPos);
-        model = glm::scale(model, glm::vec3(0.2f));
-        lightCubeShader.Set("model", model);
-
-        glBindVertexArray(lightCubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        for (OGLTest::UInt32 i = 0; i < 10; i++) {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            float angle = 20.0f * i;
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            lightingShader.Set("model", model);
+            
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
         glBindVertexArray(0);
 
