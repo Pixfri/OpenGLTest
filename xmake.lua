@@ -34,7 +34,7 @@ target("OpenGLTest")
     add_rules("cp-resources")
 
     add_files("Source/OpenGLTest/**.cpp")
-    add_headerfiles("Include/**.hpp", "Include/OpenGLTest/**.h")
+    add_headerfiles("Include/**.hpp", "Include/OpenGLTest/**.inl")
     add_includedirs("Include/", {public = true})
 
     if has_config("use_pch") then
