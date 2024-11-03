@@ -40,6 +40,7 @@ namespace OGLTest {
     void Mesh::Draw(Shader& shader) {
         UInt32 diffuseNr = 1;
         UInt32 specularNr = 1;
+        UInt32 shininessNr = 1;
 
         for (UInt32 i = 0; i < m_Textures.size(); i++) {
             glActiveTexture(GL_TEXTURE0 + i);
@@ -56,6 +57,12 @@ namespace OGLTest {
                 {
                     number = std::to_string(specularNr++);
                     name = "texture_specular";
+                    break;
+                }
+            case TextureType::Shininess:
+                {
+                    number = std::to_string(shininessNr++);
+                    name = "texture_sininess";
                     break;
                 }
             }

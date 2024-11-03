@@ -21,12 +21,14 @@ namespace OGLTest {
 
     enum class TextureType : UInt8 {
         Diffuse,
-        Specular
+        Specular,
+        Shininess
     };
 
     struct Texture {
         UInt32 Id;
         TextureType Type;
+        std::string Path;
     };
 
     class Mesh {
@@ -34,12 +36,6 @@ namespace OGLTest {
         Mesh(const std::vector<Vertex>& vertices, const std::vector<UInt32>& indices,
              const std::vector<Texture>& textures);
         ~Mesh() = default;
-
-        Mesh(const Mesh&) = delete;
-        Mesh(Mesh&&) = delete;
-
-        Mesh& operator=(const Mesh&) = delete;
-        Mesh& operator=(Mesh&&) = delete;
 
         [[nodiscard]] inline std::vector<Vertex> GetVertices() const;
         [[nodiscard]] inline std::vector<UInt32> GetIndices() const;

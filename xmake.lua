@@ -10,7 +10,7 @@ else
   add_defines("OGLTEST_DEBUG")
 end
 
-add_requires("glad", "glfw", "glm", "stb")
+add_requires("glad", "glfw", "glm", "stb", "assimp")
 
 set_encodings("utf-8")
 set_exceptions("cxx")
@@ -40,7 +40,7 @@ target("OpenGLTest")
     
     add_includedirs("Include/", {public = true})
     
-    for _, ext in ipairs({".vert", ".frag", ".png"}) do
+    for _, ext in ipairs({".vert", ".frag", ".png", ".mtl", ".obj", ".jpg"}) do
       add_extrafiles("Resources/**" .. ext)
     end
 
@@ -48,4 +48,4 @@ target("OpenGLTest")
       set_pcxxheader("Include/OpenGLTest/pch.hpp")
     end
       
-    add_packages("glad", "glfw", "glm", "stb")
+    add_packages("glad", "glfw", "glm", "stb", "assimp")
