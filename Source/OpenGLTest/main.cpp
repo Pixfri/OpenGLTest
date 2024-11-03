@@ -93,7 +93,7 @@ int main() {
     
     glEnable(GL_DEPTH_TEST);
     
-    OGLTest::Shader lightingShader{"Resources/Shaders/common.vert", "Resources/Shaders/spotlight.frag"};
+    OGLTest::Shader lightingShader{"Resources/Shaders/common.vert", "Resources/Shaders/combined.frag"};
     OGLTest::Shader lightCubeShader{"Resources/Shaders/common.vert", "Resources/Shaders/light.frag"};
     
     float vertices[] = {
@@ -154,6 +154,13 @@ int main() {
         glm::vec3(-1.3f,  1.0f, -1.5f)
     };
 
+    glm::vec3 pointLightPositions[] = {
+        glm::vec3( 0.7f,  0.2f,  2.0f),
+        glm::vec3( 2.3f, -3.3f, -4.0f),
+        glm::vec3(-4.0f,  2.0f, -12.0f),
+        glm::vec3( 0.0f,  0.0f, -3.0f)
+    };
+
     // Configure the cube's VAO and VBO
     GLuint VBO, cubeVAO;
     glGenVertexArrays(1, &cubeVAO);
@@ -211,20 +218,57 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         lightingShader.Use();
-        lightingShader.Set("light.position", g_Camera.Position);
-        lightingShader.Set("light.direction", g_Camera.Front);
-        lightingShader.Set("light.cutOff", glm::cos(glm::radians(12.5f)));
-        lightingShader.Set("light.outerCutOff", glm::cos(glm::radians(17.5f)));
         lightingShader.Set("viewPos", g_Camera.Position);
-        
-        lightingShader.Set("light.ambient", 0.2f, 0.2f, 0.2f);
-        lightingShader.Set("light.diffuse", 0.8f, 0.8f, 0.8f);
-        lightingShader.Set("light.specular", 1.0f, 1.0f, 1.0f);
-        lightingShader.Set("light.constant", 1.0f);
-        lightingShader.Set("light.linear", 0.09f);
-        lightingShader.Set("light.quadratic", 0.032f);
-
         lightingShader.Set("material.shininess", 32.0f);
+
+        // directional light
+        lightingShader.Set("dirLight.direction", -0.2f, -1.0f, -0.3f);
+        lightingShader.Set("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+        lightingShader.Set("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+        lightingShader.Set("dirLight.specular", 0.5f, 0.5f, 0.5f);
+        // point light 1
+        lightingShader.Set("pointLights[0].position", pointLightPositions[0]);
+        lightingShader.Set("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
+        lightingShader.Set("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
+        lightingShader.Set("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+        lightingShader.Set("pointLights[0].constant", 1.0f);
+        lightingShader.Set("pointLights[0].linear", 0.09f);
+        lightingShader.Set("pointLights[0].quadratic", 0.032f);
+        // point light 2
+        lightingShader.Set("pointLights[1].position", pointLightPositions[1]);
+        lightingShader.Set("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
+        lightingShader.Set("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
+        lightingShader.Set("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
+        lightingShader.Set("pointLights[1].constant", 1.0f);
+        lightingShader.Set("pointLights[1].linear", 0.09f);
+        lightingShader.Set("pointLights[1].quadratic", 0.032f);
+        // point light 3
+        lightingShader.Set("pointLights[2].position", pointLightPositions[2]);
+        lightingShader.Set("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
+        lightingShader.Set("pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
+        lightingShader.Set("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
+        lightingShader.Set("pointLights[2].constant", 1.0f);
+        lightingShader.Set("pointLights[2].linear", 0.09f);
+        lightingShader.Set("pointLights[2].quadratic", 0.032f);
+        // point light 4
+        lightingShader.Set("pointLights[3].position", pointLightPositions[3]);
+        lightingShader.Set("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
+        lightingShader.Set("pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
+        lightingShader.Set("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
+        lightingShader.Set("pointLights[3].constant", 1.0f);
+        lightingShader.Set("pointLights[3].linear", 0.09f);
+        lightingShader.Set("pointLights[3].quadratic", 0.032f);
+        // spotLight
+        lightingShader.Set("spotLight.position", g_Camera.Position);
+        lightingShader.Set("spotLight.direction", g_Camera.Front);
+        lightingShader.Set("spotLight.ambient", 0.0f, 0.0f, 0.0f);
+        lightingShader.Set("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
+        lightingShader.Set("spotLight.specular", 1.0f, 1.0f, 1.0f);
+        lightingShader.Set("spotLight.constant", 1.0f);
+        lightingShader.Set("spotLight.linear", 0.09f);
+        lightingShader.Set("spotLight.quadratic", 0.032f);
+        lightingShader.Set("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+        lightingShader.Set("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));     
 
         glm::mat4 projection = glm::perspective(glm::radians(g_Camera.Fov), static_cast<float>(WINDOW_WIDTH) / static_cast<float>(WINDOW_HEIGHT), 0.1f, 100.0f);
         glm::mat4 view = g_Camera.GetViewMatrix();
@@ -248,6 +292,20 @@ int main() {
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
             lightingShader.Set("model", model);
             
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+
+        lightCubeShader.Use();
+        lightCubeShader.Set("proj", projection);
+        lightCubeShader.Set("view", view);
+
+        glBindVertexArray(lightCubeVAO);
+        glm::mat4 model = glm::mat4(1.0f);
+        for (unsigned int i = 0; i < 4; i++) {
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, pointLightPositions[i]);
+            model = glm::scale(model, glm::vec3(0.2f)); // Make it a smaller cube
+            lightCubeShader.Set("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
