@@ -42,6 +42,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_FALSE);
 
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
@@ -53,6 +54,13 @@ int main() {
         return -2;
     }
     glfwMakeContextCurrent(window);
+    
+    GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* videoMode = glfwGetVideoMode(primaryMonitor);
+
+    const OGLTest::Int32 windowLeft = videoMode->width / 2 - WINDOW_WIDTH / 2;
+    const OGLTest::Int32 windowTop = videoMode->height / 2 - WINDOW_HEIGHT / 2;
+    glfwSetWindowPos(window, windowLeft, windowTop);
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
